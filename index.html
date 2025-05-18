@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blocky Browser</title>
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<link href="Blocky-browser-image.png" rel="icon">
+<link href="logo.png" rel="icon">
 <style>
 :root {
   --neon-green: #39ff14;
@@ -466,11 +465,10 @@ function getSuggestions(input) {
 if (!input) return [];
 input = input.toLowerCase();
 
-// Use Wikipedia API for suggestions
 fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${encodeURIComponent(input)}&limit=5&origin=*`)
 .then(response => response.json())
 .then(data => {
-const suggestions = data[1]; // Array of suggestion titles
+const suggestions = data[1]; 
 displaySuggestions(suggestions);
 })
 .catch(error => {
@@ -525,7 +523,6 @@ searchResults.innerHTML = `
     </div>
 `;
 
-// Using Wikipedia API for search results
 const wikiSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchInput)}&format=json&origin=*`;
 
 fetch(wikiSearchUrl)
@@ -561,7 +558,7 @@ results.forEach(result => {
 const resultDiv = document.createElement('div');
 resultDiv.className = 'result-item';
 
-const snippet = result.snippet.replace(/<\/?span[^>]*>/g, ''); // Remove span tags from snippet
+const snippet = result.snippet.replace(/<\/?span[^>]*>/g, ''); 
 
 resultDiv.innerHTML = `
 <h3><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(result.title)}" target="_blank">${result.title}</a></h3>
