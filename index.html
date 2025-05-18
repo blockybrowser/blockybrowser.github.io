@@ -1,0 +1,601 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blocky Browser</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<link href="Blocky-browser-image.png" rel="icon">
+<style>
+:root {
+  --neon-green: #39ff14;
+  --darker-green: #2be010;
+  --dark-bg: #000;
+  --light-text: #fff;
+  --highlight: #0ff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(120deg, rgba(0,0,0,0.95), rgba(0,50,0,0.8), rgba(0,0,0,0.95));
+  font-family: 'Press Start 2P', cursive;
+  color: var(--neon-green);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.1),
+    rgba(0, 0, 0, 0.1) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.title-container {
+  margin: 40px 0;
+  position: relative;
+  z-index: 2;
+}
+
+.title {
+  font-size: 30px;
+  color: var(--neon-green);
+  text-shadow: 
+    0 0 5px var(--neon-green),
+    0 0 10px var(--neon-green),
+    0 0 20px var(--neon-green);
+  -webkit-text-stroke: 1px var(--light-text);
+  animation: pulse 2s infinite alternate;
+  text-align: center;
+  margin: 40px 0;
+}
+
+@keyframes pulse {
+  from { text-shadow: 0 0 5px var(--neon-green), 0 0 10px var(--neon-green); }
+  to { text-shadow: 0 0 10px var(--neon-green), 0 0 20px var(--neon-green), 0 0 30px var(--neon-green); }
+}
+
+.title sup {
+  font-size: 16px;
+  vertical-align: super;
+  margin-left: 5px;
+}
+
+.search-container {
+  position: relative;
+  display: flex;
+  gap: 10px;
+  z-index: 10;
+  width: 650px;
+  max-width: 90%;
+  margin: 20px auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+#searchInput {
+  padding: 15px;
+  width: 100%;
+  font-family: 'Press Start 2P', cursive;
+  border: 4px solid var(--neon-green);
+  background: var(--dark-bg);
+  color: var(--neon-green);
+  outline: none;
+  box-shadow: 0 0 10px var(--neon-green);
+  transition: all 0.3s ease;
+}
+
+#searchInput:focus {
+  box-shadow: 0 0 15px var(--neon-green), 0 0 30px var(--neon-green);
+}
+
+#searchButton {
+  padding: 15px;
+  cursor: pointer;
+  min-width: 75px;
+  font-family: 'Press Start 2P', cursive;
+  border: 4px solid var(--neon-green);
+  background: var(--dark-bg);
+  color: var(--neon-green);
+  box-shadow: 0 0 10px var(--neon-green);
+  transition: all 0.2s ease;
+}
+
+#searchButton:hover {
+  background: var(--neon-green);
+  color: var(--dark-bg);
+  transform: scale(1.05);
+}
+
+#searchButton:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 5px var(--neon-green);
+}
+
+.search-png {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+}
+
+.suggestions-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: calc(100% - 85px);
+  background: rgba(0, 0, 0, 0.9);
+  border: 4px solid var(--neon-green);
+  border-top: none;
+  display: none;
+  z-index: 999;
+  max-height: 300px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-green) var(--dark-bg);
+}
+
+.suggestions-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.suggestions-container::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+.suggestions-container::-webkit-scrollbar-thumb {
+  background-color: var(--neon-green);
+  border-radius: 0;
+}
+
+.suggestion-item {
+  padding: 15px;
+  cursor: pointer;
+  color: var(--neon-green);
+  border-bottom: 2px solid var(--neon-green);
+  transition: all 0.2s ease;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+.suggestion-item:hover {
+  background: var(--neon-green);
+  color: var(--dark-bg);
+}
+
+.search-results {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.95);
+  border: 4px solid var(--neon-green);
+  overflow-y: auto;
+  padding: 20px;
+  box-sizing: border-box;
+  z-index: 1001;
+  color: var(--neon-green);
+  scrollbar-width: thin;
+  scrollbar-color: var(--neon-green) var(--dark-bg);
+}
+
+.search-results::-webkit-scrollbar {
+  width: 10px;
+}
+
+.search-results::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+.search-results::-webkit-scrollbar-thumb {
+  background-color: var(--neon-green);
+  border-radius: 0;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 25px;
+  font-size: 28px;
+  cursor: pointer;
+  color: var(--neon-green);
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  color: var(--light-text);
+  text-shadow: 0 0 10px var(--neon-green);
+  transform: scale(1.2);
+}
+
+.close-btn:active {
+  color: var(--highlight);
+  transform: scale(1);
+}
+
+.result-item {
+  margin-bottom: 25px;
+  padding: 20px;
+  border: 4px solid var(--neon-green);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.result-item::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, transparent, rgba(57, 255, 20, 0.1), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.result-item:hover::before {
+  transform: translateX(100%);
+}
+
+.result-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0 15px var(--neon-green);
+}
+
+.result-item h3 {
+  margin: 0 0 15px 0;
+}
+
+.result-item h3 a {
+  color: var(--neon-green);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.result-item h3 a:hover {
+  text-shadow: 0 0 10px var(--neon-green);
+}
+
+.result-item .url {
+  color: var(--highlight);
+  margin-bottom: 15px;
+  word-break: break-all;
+  font-size: 12px;
+}
+
+.result-item .description {
+  color: var(--light-text);
+  line-height: 1.6;
+}
+
+.loading {
+  color: var(--neon-green);
+  text-align: center;
+  margin-top: 20px;
+  font-size: 18px;
+  animation: loading 1s infinite;
+}
+
+@keyframes loading {
+  0% { opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { opacity: 0.3; }
+}
+
+.glitch-effect {
+  position: relative;
+  animation: glitch 1s linear infinite;
+  z-index: 1;
+}
+
+@keyframes glitch {
+  2%, 64% {
+    transform: translate(2px, 0) skew(0deg);
+  }
+  4%, 60% {
+    transform: translate(-2px, 0) skew(0deg);
+  }
+  62% {
+    transform: translate(0, 0) skew(5deg); 
+  }
+}
+
+.glitch-effect:before,
+.glitch-effect:after {
+  content: attr(title);
+  position: absolute;
+  left: 0;
+}
+
+.glitch-effect:before {
+  animation: glitchTop 1s linear infinite;
+  clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+  -webkit-clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+}
+
+@keyframes glitchTop {
+  2%, 64% {
+    transform: translate(2px, -2px);
+  }
+  4%, 60% {
+    transform: translate(-2px, 2px);
+  }
+  62% {
+    transform: translate(13px, -1px) skew(-13deg); 
+  }
+}
+
+.glitch-effect:after {
+  animation: glitchBotom 1.5s linear infinite;
+  clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+}
+
+@keyframes glitchBotom {
+  2%, 64% {
+    transform: translate(-2px, 0);
+  }
+  4%, 60% {
+    transform: translate(-2px, 0);
+  }
+  62% {
+    transform: translate(-22px, 5px) skew(21deg); 
+  }
+}
+
+.content {
+  padding: 20px;
+  margin-top: 80px;
+}
+
+.download {
+  text-decoration: none;
+  color: var(--neon-green);
+}
+
+.download-btn {
+  padding: 2px 13px;
+  background-color: black;
+  border-radius: 0px;
+}
+</style>
+</head>
+<body>
+<br>
+<br>
+<div class="title-container">
+<div class="title glitch-effect" title="BLOCKY BROWSER">BLOCKY BROWSER<sup>3</sup></div>
+</div>
+<div class="search-container">
+<input type="text" id="searchInput" placeholder="Search the square web...">
+<button id="searchButton"><img src="Blocky-browser-image.png" type="image/png" class="search-png" alt="🔍"></button>
+<div id="suggestions" class="suggestions-container"></div>
+</div>
+<div id="searchResults" class="search-results"></div>
+
+
+<script>
+const englishWordList = [
+"ability", "the", "be", "to", "of", "and", "a", "in", "that", "have", "i", "it", "for", "not", "on", "with", "he", "as", "you", "do", "at",
+"this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an", "will", "my", "one", "all", "would", "there",
+"their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "can", "like", "time", "just", "him",
+"know", "take", "person", "into", "year", "your", "good", "some", "could", "them", "see", "other", "than", "then", "now",
+"look", "only", "come", "its", "over", "think", "also", "back", "after", "use", "two", "how", "our", "work", "first",
+"well", "way", "even", "new", "want", "because", "any", "these", "give", "day", "most", "us", "such", "no", "here",
+"where", "why", "when", "same", "each", "few", "might", "own", "those", "through", "down", "should", "someone",
+"something", "everything", "anything", "nothing", "place", "during", "make", "life", "little", "state", "big",
+"high", "different", "small", "tell", "never", "always", "ever", "still", "every", "part", "while", "both", "end",
+"begin", "find", "feel", "leave", "put", "keep", "call", "right", "left", "turn", "show", "play", "start", "stop",
+"read", "write", "speak", "listen", "watch", "believe", "understand", "love", "hate", "hope", "wish", "try", "help",
+"need", "become", "seem", "appear", "bring", "continue", "succeed", "fail", "wait", "live", "die", "change",
+"grow", "develop", "build", "destroy", "create", "learn", "teach", "study", "sing", "dance", "run", "walk",
+"sit", "stand", "fall", "sleep", "wake", "drive", "travel", "move", "stay", "remember", "forget", "prefer",
+"choose", "decide", "plan", "prepare", "realize", "imagine", "dream", "expect", "search", "lose", "win", "gain",
+"offer", "accept", "refuse", "deny", "admit", "argue", "discuss", "debate", "explain", "describe", "report"
+];
+
+function levenshteinDistance(a, b) {
+const matrix = [];
+for (let i = 0; i <= b.length; i++) {
+matrix[i] = [i];
+}
+for (let j = 0; j <= a.length; j++) {
+matrix[0][j] = j;
+}
+for (let i = 1; i <= b.length; i++) {
+for (let j = 1; j <= a.length; j++) {
+if (b.charAt(i - 1) === a.charAt(j - 1)) {
+matrix[i][j] = matrix[i - 1][j - 1];
+} else {
+matrix[i][j] = Math.min(
+matrix[i - 1][j - 1] + 1,
+matrix[i][j - 1] + 1,
+matrix[i - 1][j] + 1
+);
+}
+}
+}
+return matrix[b.length][a.length];
+}
+
+function isEnglishWord(word) {
+return englishWordList.includes(word.toLowerCase());
+}
+
+function findClosestMatch(word, dictionary) {
+let closestMatch = '';
+let minDistance = Infinity;
+for (const dictWord of dictionary) {
+const distance = levenshteinDistance(word, dictWord);
+if (distance < minDistance) {
+minDistance = distance;
+closestMatch = dictWord;
+}
+}
+return closestMatch;
+}
+
+function getSuggestions(input) {
+if (!input) return [];
+input = input.toLowerCase();
+
+// Use Wikipedia API for suggestions
+fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&search=${encodeURIComponent(input)}&limit=5&origin=*`)
+.then(response => response.json())
+.then(data => {
+const suggestions = data[1]; // Array of suggestion titles
+displaySuggestions(suggestions);
+})
+.catch(error => {
+console.error('Error fetching suggestions:', error);
+const englishWordSuggestions = englishWordList
+.filter(word => word.includes(input))
+.slice(0, 5);
+displaySuggestions(englishWordSuggestions);
+});
+}
+
+function displaySuggestions(suggestions) {
+const suggestionsContainer = document.getElementById('suggestions');
+suggestionsContainer.innerHTML = '';
+
+if (suggestions.length === 0) {
+suggestionsContainer.style.display = 'none';
+return;
+}
+
+suggestions.forEach(suggestion => {
+const div = document.createElement('div');
+div.className = 'suggestion-item';
+div.textContent = suggestion;
+div.onclick = () => {
+document.getElementById('searchInput').value = suggestion;
+performSearch();
+suggestionsContainer.style.display = 'none';
+};
+suggestionsContainer.appendChild(div);
+});
+
+suggestionsContainer.style.display = 'block';
+}
+
+function performSearch() {
+const searchInput = document.getElementById('searchInput').value.trim();
+if (!searchInput) return;
+
+const searchResults = document.getElementById('searchResults');
+searchResults.style.display = 'block';
+searchResults.innerHTML = `
+<span class="close-btn" onclick="document.getElementById('searchResults').style.display='none'">&times;</span>
+<h2>Results for: ${searchInput}</h2>
+    <div class="loading-container loading" id="loadingIndicator">
+      <div class="loading-text">SEARCHING THE GRID...</div>
+      <div class="dots">
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+    </div>
+`;
+
+// Using Wikipedia API for search results
+const wikiSearchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(searchInput)}&format=json&origin=*`;
+
+fetch(wikiSearchUrl)
+.then(response => response.json())
+.then(data => {
+displayWikiResults(data, searchInput);
+})
+.catch(error => {
+console.error('Error fetching results:', error);
+searchResults.innerHTML = `
+<span class="close-btn" onclick="document.getElementById('searchResults').style.display='none'">&times;</span>
+<h2>Results for: ${searchInput}</h2>
+<div class="result-item">An error occurred while searching. Please try again.</div>
+`;
+});
+}
+
+function displayWikiResults(data, query) {
+const searchResults = document.getElementById('searchResults');
+document.getElementById('loadingIndicator').style.display = 'none';
+searchResults.innerHTML = `
+<span class="close-btn" onclick="document.getElementById('searchResults').style.display='none'">&times;</span>
+<h2>Results for: ${query}</h2>
+`;
+
+if (!data.query || !data.query.search || data.query.search.length === 0) {
+searchResults.innerHTML += '<div class="result-item">No results found</div>';
+return;
+}
+
+const results = data.query.search;
+results.forEach(result => {
+const resultDiv = document.createElement('div');
+resultDiv.className = 'result-item';
+
+const snippet = result.snippet.replace(/<\/?span[^>]*>/g, ''); // Remove span tags from snippet
+
+resultDiv.innerHTML = `
+<h3><a href="https://en.wikipedia.org/wiki/${encodeURIComponent(result.title)}" target="_blank">${result.title}</a></h3>
+<div class="url">https://en.wikipedia.org/wiki/${encodeURIComponent(result.title)}</div>
+<div class="description">${snippet}...</div>
+`;
+searchResults.appendChild(resultDiv);
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+const searchButton = document.getElementById('searchButton');
+const searchInput = document.getElementById('searchInput');
+
+searchButton.addEventListener('click', performSearch);
+
+searchInput.addEventListener('keypress', (e) => {
+if (e.key === 'Enter') {
+performSearch();
+}
+});
+
+searchInput.addEventListener('input', (e) => {
+getSuggestions(e.target.value);
+});
+
+document.addEventListener('click', (e) => {
+if (!e.target.closest('.search-container')) {
+document.getElementById('suggestions').style.display = 'none';
+}
+});
+});
+</script>
+<div class="footer">
+  BLOCKY BROWSER &copy; 2025 | THE SQUARE WEB
+</div>
+</body>
+</html>
