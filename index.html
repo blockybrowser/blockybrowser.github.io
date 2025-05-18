@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -567,6 +568,16 @@ resultDiv.innerHTML = `
 `;
 searchResults.appendChild(resultDiv);
 });
+
+const alternativesDiv = document.createElement('div');
+alternativesDiv.className = 'result-item';
+alternativesDiv.innerHTML = `
+<h3>Try your search on:</h3>
+<p><a href="https://www.google.com/search?q=${encodeURIComponent(query)}" target="_blank" style="color: var(--neon-green);">Google</a></p>
+<p><a href="https://www.bing.com/search?q=${encodeURIComponent(query)}" target="_blank" style="color: var(--neon-green);">Bing</a></p>
+`;
+searchResults.appendChild(alternativesDiv);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 const searchButton = document.getElementById('searchButton');
