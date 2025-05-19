@@ -229,13 +229,13 @@ body::before {
 }
 
 .close-btn:hover {
-  color: var(--light-text);
+  color: white;
   text-shadow: 0 0 10px var(--neon-green);
   transform: scale(1.2);
 }
 
 .close-btn:active {
-  color: var(--highlight);
+  color: red;
   transform: scale(1);
 }
 
@@ -514,6 +514,7 @@ searchResults.style.display = 'block';
 searchResults.innerHTML = `
 <span class="close-btn" onclick="document.getElementById('searchResults').style.display='none'">&times;</span>
 <h2>Results for: ${searchInput}</h2>
+    <br>
     <br>
     <div class="loading-container loading" id="loadingIndicator">
       <div class="loading-text">SEARCHING THE GRID...</div>
